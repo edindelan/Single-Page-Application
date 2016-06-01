@@ -1,20 +1,39 @@
 console.log("Application started!");
 
 var data = [{
+        id: 1,
         author: "Michael Londoni",
         title: "Darkness of the Space",
         url: "https://michael.com"
     },
     {
+        id: 2,
         author: "Ana Grey",
         title: "Cabin in the woods",
         url: "http://anagrey.de"
     },
     {
+        id: 3,
         author: "Lori Smidth",
         title: "Eine shone Sontag",
         url: "https://lori.de"
     }];
+
+var navigation = [{
+        id: 'nav_home',
+        title: 'Home',
+        url: '#'
+},
+    {
+        id: 'nav_blogs',
+        title: 'Blogs',
+        url: '#blogs'
+},
+    {
+        id: 'nav_users',
+        title: 'Users',
+        url: '#users'
+}];
 
 var Blog = Backbone.Model.extend({
     defaults: {
@@ -75,7 +94,9 @@ var BlogListView = Backbone.View.extend({
 
     renderItem: function (model) {
         console.log(model);
-        var itemView = new BlogItemView({ model: model });
+        var itemView = new BlogItemView({
+            model: model
+        });
         this.$el.append(itemView.render().el);
     }
 });
@@ -89,11 +110,11 @@ var BlogItemView = Backbone.View.extend({
     },
 
     events: {
-        'click .edit-blog':       'editBlog',
-        'click .delete-blog':     'deleteBlog',
-        'click .update-blog':     'updateBlog',
-        'click .cancel-editing':  'cancelEditing',
-        'dblclick .row-field':    'editBlog'
+        'click .edit-blog': 'editBlog',
+        'click .delete-blog': 'deleteBlog',
+        'click .update-blog': 'updateBlog',
+        'click .cancel-editing': 'cancelEditing',
+        'dblclick .row-field': 'editBlog'
     },
 
     editBlog: function () {
@@ -116,14 +137,14 @@ var BlogItemView = Backbone.View.extend({
             url: this.$('.url-input').val()
         });
 
-        if(_.isEmpty(this.model.changed)){
-          this.model.trigger('change');
+        if (_.isEmpty(this.model.changed)) {
+            this.model.trigger('change');
         };
 
     },
 
     cancelEditing: function () {
-      this.render();
+        this.render();
     },
 
     template: _.template($('.blogs-list-template').html()),
@@ -137,46 +158,6 @@ var BlogItemView = Backbone.View.extend({
 
 var blogs = new Blogs(data);
 
-var view = new BlogListView({collection: blogs});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+var view = new BlogListView({
+    collection: blogs
+});
