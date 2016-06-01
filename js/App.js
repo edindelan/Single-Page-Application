@@ -1,19 +1,19 @@
 console.log("Application started!");
 
 var data = [{
-        author: "Edin Blog",
-        title: "Edin",
-        url: "neki.com"
+        author: "Michael Londoni",
+        title: "Darkness of the Space",
+        url: "https://michael.com"
     },
     {
-        author: "Lord Blog",
-        title: "Nikita",
-        url: "nekisajt.com"
+        author: "Ana Grey",
+        title: "Cabin in the woods",
+        url: "http://anagrey.de"
     },
     {
-        author: "Ludilo Blog",
-        title: "Samuel",
-        url: "ludnica.com"
+        author: "Lori Smidth",
+        title: "Eine shone Sontag",
+        url: "https://lori.de"
     }];
 
 var Blog = Backbone.Model.extend({
@@ -93,7 +93,7 @@ var BlogItemView = Backbone.View.extend({
         'click .delete-blog':     'deleteBlog',
         'click .update-blog':     'updateBlog',
         'click .cancel-editing':  'cancelEditing',
-        'dblclick .row-field':             'editBlog'
+        'dblclick .row-field':    'editBlog'
     },
 
     editBlog: function () {
