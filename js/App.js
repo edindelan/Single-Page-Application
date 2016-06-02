@@ -47,6 +47,8 @@ var Blogs = Backbone.Collection.extend({
     model: Blog
 });
 
+var blogs = new Blogs(data);
+
 var NavigationView = Backbone.View.extend({
     el: '.navigation-container',
 
@@ -85,7 +87,7 @@ var HomeLayoutView = Backbone.View.extend({
        console.log("Home layout inited!")
        this.render();
        var view = new BlogListView({
-            collection: new Blogs(data)
+            collection: blogs
        });
     },
     render: function () {
@@ -105,11 +107,29 @@ var BlogsLayoutvView = Backbone.View.extend({
 
 var UsersLayoutvView = Backbone.View.extend({
     el: '.app-container',
-    initialize: function () {
+    initialize: function (options) {
+      console.log(options);
       this.render();
+      if(options.editModel){
+          new UserDetailsView({model: options.editModel});
+      }
     },
     render: function () {
-        this.$el.html("<h2>Users page</h2>");
+        this.$el.html("<h2>Users page</h2><div class='user-details-container'></div>");
+    }
+});
+
+var UserDetailsView = Backbone.View.extend({
+    el: '.user-details-container',
+    collection: blogs,
+    template: _.template($('.user-details-template').html()),
+    initialize: function(options){
+        console.log(options.model);
+        var modelToEdit = this.collection.findWhere({id: parseInt(options.model, 10)});
+        this.render(modelToEdit);
+    },
+    render: function(model) {
+        this.$el.html(this.template(model.toJSON()));
     }
 });
 
@@ -122,6 +142,7 @@ var BlogAddView = Backbone.View.extend({
 
     addBlog: function () {
         var blog = {
+            id: parseInt(_.uniqueId(), 10),
             author: $('.author-input').val(),
             title: $('.title-input').val(),
             url: $('.url-input').val(),
@@ -181,7 +202,13 @@ var BlogItemView = Backbone.View.extend({
         'click .delete-blog':    'deleteBlog',
         'click .update-blog':    'updateBlog',
         'click .cancel-editing': 'cancelEditing',
+        'click .info-blog':      'infoBlog',
         'dblclick .row-field':   'editBlog'
+    },
+
+    infoBlog: function () {
+      console.log(this.model);
+        Backbone.history.navigate("users/" + this.model.id, {trigger: true});
     },
 
     editBlog: function () {
@@ -225,9 +252,9 @@ var BlogItemView = Backbone.View.extend({
 
 var Router = Backbone.Router.extend({
     routes: {
-        '':      'home',
-        'blogs': 'blogs',
-        'users': 'users'
+        '':           'home',
+        'blogs':       'blogs',
+        'users(/:id)': 'users'
     },
 
     home: function () {
@@ -238,10 +265,12 @@ var Router = Backbone.Router.extend({
         new BlogsLayoutvView();
     },
 
-    users: function () {
-        new UsersLayoutvView();
+    users: function (id) {
+        new UsersLayoutvView({
+            editModel: id
+        });
     },
-})
+});
 
 new Router;
 Backbone.history.start();
