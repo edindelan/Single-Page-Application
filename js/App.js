@@ -47,8 +47,74 @@ var Blogs = Backbone.Collection.extend({
     model: Blog
 });
 
+var NavigationView = Backbone.View.extend({
+    el: '.navigation-container',
+
+    collection: new Backbone.Collection(),
+
+    events: {
+        'click a': 'click'
+    },
+
+    click: function (e) {
+      console.log($(e.currentTarget).attr('id').replace('nav_', ''));
+    },
+
+    template: _.template($('.navigation-template').html()),
+
+    initialize: function () {
+      this.collection.set(navigation);
+      console.log(this.collection);
+      this.render();
+    },
+
+    render: function () {
+        this.collection.each(this.renderNavItem, this);
+    },
+
+    renderNavItem: function (model) {
+        this.$el.append(this.template(model.toJSON()));
+    }
+
+});
+
+var HomeLayoutView = Backbone.View.extend({
+    el: ".app-container",
+    template: _.template($('.home-layout-template').html()),
+    initialize: function () {
+       console.log("Home layout inited!")
+       this.render();
+       var view = new BlogListView({
+            collection: new Blogs(data)
+       });
+    },
+    render: function () {
+        this.$el.html(this.template());
+    }
+});
+
+var BlogsLayoutvView = Backbone.View.extend({
+    el: '.app-container',
+    initialize: function () {
+      this.render();
+    },
+    render: function () {
+        this.$el.html("<h2>Blog page</h2>");
+    }
+});
+
+var UsersLayoutvView = Backbone.View.extend({
+    el: '.app-container',
+    initialize: function () {
+      this.render();
+    },
+    render: function () {
+        this.$el.html("<h2>Users page</h2>");
+    }
+});
+
 var BlogAddView = Backbone.View.extend({
-    el: $('.add-blog-container'),
+    el: '.add-blog-container',
 
     events: {
         'click .add-blog': 'addBlog'
@@ -60,7 +126,7 @@ var BlogAddView = Backbone.View.extend({
             title: $('.title-input').val(),
             url: $('.url-input').val(),
         };
-        blogs.add(blog);
+        this.collection.add(blog);
         this.render();
     },
 
@@ -72,13 +138,13 @@ var BlogAddView = Backbone.View.extend({
         this.$el.html("");
         this.$el.append(this.template());
     }
-})
+});
 
 var BlogListView = Backbone.View.extend({
-    el: $(".blogs-list"),
+    el: ".blogs-list",
 
     initialize: function () {
-        var addView = new BlogAddView();
+        var addView = new BlogAddView({collection: this.collection});
         addView.render();
         this.render();
         this.listenTo(this.collection, 'add', this.renderItem);
@@ -86,6 +152,7 @@ var BlogListView = Backbone.View.extend({
     },
 
     render: function () {
+        console.log("BlogList layout inited!")
         this.$el.html("");
 
         this.collection.each(this.renderItem.bind(this));
@@ -110,11 +177,11 @@ var BlogItemView = Backbone.View.extend({
     },
 
     events: {
-        'click .edit-blog': 'editBlog',
-        'click .delete-blog': 'deleteBlog',
-        'click .update-blog': 'updateBlog',
+        'click .edit-blog':      'editBlog',
+        'click .delete-blog':    'deleteBlog',
+        'click .update-blog':    'updateBlog',
         'click .cancel-editing': 'cancelEditing',
-        'dblclick .row-field': 'editBlog'
+        'dblclick .row-field':   'editBlog'
     },
 
     editBlog: function () {
@@ -156,8 +223,26 @@ var BlogItemView = Backbone.View.extend({
     }
 });
 
-var blogs = new Blogs(data);
+var Router = Backbone.Router.extend({
+    routes: {
+        '':      'home',
+        'blogs': 'blogs',
+        'users': 'users'
+    },
 
-var view = new BlogListView({
-    collection: blogs
-});
+    home: function () {
+        new HomeLayoutView();
+    },
+
+    blogs: function () {
+        new BlogsLayoutvView();
+    },
+
+    users: function () {
+        new UsersLayoutvView();
+    },
+})
+
+new Router;
+Backbone.history.start();
+new NavigationView();
